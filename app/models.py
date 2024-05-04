@@ -9,20 +9,23 @@ class Product(db.Model):
     price = db.Column(db.Double)
     brand_id = db.Column(db.Integer, db.ForeignKey('brands.id'))
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
-    
+
     images = db.relationship("Image", backref='thing', lazy=True)
     brand = db.relationship("Brand", backref='br', lazy=True)
     category = db.relationship("Category", backref='ca', lazy=True)
 
     def __repr__(self):
-        return f'<Product name:{self.name} desc:{self.product_description} price:{self.price} brand:{self.brand_id} cat:{self.category_id}>'
+        return f'<Product name:{self.name} desc:{self.product_description} price:{self.price} brand:{self.brand_id} cat:{self.category_id}>' # noqa E501
 
 
 class Image(db.Model):
     __tablename__ = 'images'
     id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+    product_id = db.Column(db.Integer,
+                           db.ForeignKey('products.id'),
+                           nullable=False)
     image_name = db.Column(db.String(128), nullable=False)
+
     def __repr__(self):
         return f'<Image {self.image_name}>'
 
