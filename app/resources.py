@@ -112,7 +112,7 @@ class ProductAPI(Resource):
         images = product.images
         for image in images:
             os.remove(os.getcwd().replace('\\', '/') + "/app" +
-                      url_for('static', filename=f'uploads/{image.image_name}'))
+                      url_for('static', filename=f'uploads/{image.image_name}')) # noqa E501
             db.session.delete(image)
             db.session.flush()
         db.session.delete(product)
@@ -182,7 +182,7 @@ class ImageAPI(Resource):
             return image, 201
         else:
             raise ValueError("image is not allowed")
-    
+
     def delete(self, id):
         image = Image.query.get(id)
         if not image:
