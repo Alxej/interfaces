@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <!-- Bootstrap Bundle JS (jsDelivr CDN) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <!-- <link rel="stylesheet" href="/static/styles2.css"> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="{{url_for('static', filename='css/prototype.css')}}" rel="stylesheet" >
+        <link href="{{url_for('static', filename='css/Sidebar.css')}}" rel="stylesheet" >
+</head>
+<body style="font-family: serif;">
+<div align="center" class="header">
+<img src="//cs.petrsu.ru/style/cs_logo.png" align="left" alt="" />
+<h1 id="title"><a href="//cs.petrsu.ru/">Кафедра Информатики и Математического Обеспечения</a></h1><a href="http://www.petrsu.ru">ПетрГУ</a> |
+<a href="https://imit.petrsu.ru">ИМиИТ</a> |
+<a href="//cs.petrsu.ru/department/index.php.ru">О кафедре</a> |
+<a href="//cs.petrsu.ru/projects.php.ru">Проекты</a> |
+<a href="//cs.petrsu.ru/lab/index.php.ru">Лаборатория ИТС</a> |
+<a href="//cs.petrsu.ru/fdpw/index.php.ru">Семинары НФИ/AMICT</a><br />
+<a href="//cs.petrsu.ru/staff/index.php.ru">Сотрудники</a> |
+<a href="//cs.petrsu.ru/studies/index.php.ru">Учебный процесс</a> |
+<a href="//cs.petrsu.ru/studies/tabel_kalendar_22-23.pdf">Табель-календарь</a> |
+<a href="//cs.petrsu.ru/studies/kurs/kurs.php.ru">Курсовые и выпускные работы</a> <br />
+<a href="//cs.petrsu.ru/facilities/index.php.ru">Вычислительные ресурсы</a> |
+<a href="//cs.petrsu.ru/publications/index.php.ru">Публикации</a> |
+<a href="//cs.petrsu.ru/news/index.php.ru">Архив новостей</a> |
+<a href="//cs.petrsu.ru/contact/index.php.ru">Контактная информация</a>
+<a href="//cs.petrsu.ru/contact/index.php.en"> (English)</a>
+<br clear="all" />
+</div>
+<hr>
+<div class="container-fluid">
+        {% block content %}{% endblock %}
+</div>
+</body>
+</html>

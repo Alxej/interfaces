@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+<div class="row"><div class="col-12 text-center"><a href="/createbrand"><button type="button" class="btn btn-primary">Добавить</button></a></div></div>
+
+<div class="row top-buffer" >
+    <div class="col-12 justify-content-center">
+        <ol class="list-group list-group-numbered td-list">
+            {% for brand in brands %}
+            <li class="list-group-item">{{brand.brand_name}} 
+                <div class="col-3">
+                    <a href="/brands/{{brand.id}}/edit"><button type="button" class="btn btn-info">Изменить</button></a>
+                    <a href="/brands/{{brand.id}}/delete"><button type="button" class="btn btn-danger">Удалить</button></a>
+                </div>
+            {% endfor %} 
+        </ol>
+    </div>
+    
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+:root{
+    --color1: #84d6bd;
+    --color2: #7e94ea;
+}
+.gradient {
+    background: linear-gradient(to right,  var(--color1) 1%,var(--color2) 100%);
+}
+
+body {height: 100%;}
+
+.top-buffer { margin-top:30px; }
+
+.td-list {margin-left: 50px; margin-right: 50px;}
+
+.container {height: 100vh;}
+
+.imgHeightLimit {height:225px; max-height: 225px;}

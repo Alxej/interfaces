@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+<div class="row"><div class="col-12 text-center"><a href="/createproduct"><button type="button" class="btn btn-primary">Добавить</button></a></div></div>
+{% for x in range(2) %}
+<div class="row top-buffer" >
+    {% for y in range(3) %}
+    {% if 3*x + y <= products.items|length - 1  %} 
+    <div class="col-4">
+        <div class="card mx-auto" style="width: 18rem;">
+            <div id="{{3 * x + y}}" class="carousel carousel-dark slide">
+                <div class="carousel-inner">
+                  {% for image_index in range(products.items[3*x+y].images|length) %}
+                  {% if image_index == 0 %}                  
+                  <div class="carousel-item active" data-bs-interval="3000">
+                    <img src="static/uploads/{{products.items[3*x+y].images[image_index].image_name}}" class="w-100 img-thumbnail imgHeightLimit" alt="...">
+                  </div>
+                  {% else %}
+                  <div class="carousel-item" data-bs-interval="3000">
+                    <img src="static/uploads/{{products.items[3*x+y].images[image_index].image_name}}" class="w-100 img-thumbnail imgHeightLimit" alt="...">
+                  </div>
+                  {% endif %}
+                  {% endfor %}
+                </div>
+                {% if products.items[3*x+y].images|length > 1 %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#{{3 * x + y}}" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Предыдущий</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#{{3 * x + y}}" data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Следующий</span>
+                </button>
+                {% endif %}
+              </div>
+            <div class="card-body">
+                <h5 class="card-title">{{products.items[3*x+y].name}}</h5>
+                <p class="card-text">{{products.items[3*x+y].product_description}}</p>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Цена: {{products.items[3*x+y].price}}</li>
+                <li class="list-group-item">Бренд: {{products.items[3*x+y].brand.brand_name}}</li>
+                <li class="list-group-item">Категория: {{products.items[3*x+y].category.category_name}}</li>
+            </ul>
+            <div class="card-body">
+                <a href="/products/{{products.items[3*x+y].id}}/edit"><button type="button" class="btn btn-info">Изменить</button></a>
+                <a href="/products/{{products.items[3*x+y].id}}/delete"><button type="button" class="btn btn-danger">Удалить</button></a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}       
+</div>
+{% endfor %}
+<nav aria-label="Пример навигации по страницам">
+    <ul class="pagination justify-content-center">
+        {% if page == 1 %}
+        <li class="page-item disabled">
+            <a class="page-link">Предыдущая</a>
+          </li>
+          {% else %}
+          <li class="page-item">
+            <a class="page-link" href="{{url_for('index', page=page-1)}}">Предыдущая</a>
+          </li>
+          {% endif %}
+      {% for page in products.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+    {% if page %}
+        {% if products.page == page %}
+        <li class="page-item"><a class="page-link" href="#">{{page}}</a></li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="{{url_for('index', page=page)}}">{{page}}</a></li>
+        {% endif %}
+    {% else %}
+        ...
+    {% endif %}
+{% endfor %} 
+{% if not products.has_next %}
+        <li class="page-item disabled">
+            <a class="page-link">Следующая</a>
+          </li>
+          {% else %}
+          <li class="page-item">
+            <a class="page-link" href="{{url_for('index', page=page+1)}}">Следующая</a>
+          </li>
+          {% endif %}
+    </ul>
+</nav>
+{% endblock %}

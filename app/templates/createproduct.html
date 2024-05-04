@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+{{form.hidden_tag()}}
+<div class="col-2 mx-auto">
+    {% for msg in get_flashed_messages() %}
+    <div class="alert alert-danger" role="alert">{{msg}}</div>
+    {% endfor %}
+</div>
+<form action="" method="post", enctype="multipart/form-data">
+    {{ form.csrf_token }}
+    <div class="row top-buffer" >
+        <div class="col-4 mx-auto">
+            <div class="mb-3 row me-auto">
+                <label class="col-sm-5 col-form-label text-right">{{form.name.label()}}</label>
+                <div class="col-sm-10">{{form.name(class_= "form-control")}}</div>
+            </div>
+            <div class="mb-3 row me-auto">
+                <label class="col-sm-5 col-form-label">{{form.product_description.label()}}</label>
+                <div class="col-sm-10">{{form.product_description(class_= "form-control", rows_= 2)}}</div>
+            </div>
+            <div class="mb-3 row me-auto">
+                <label class="col-sm-5 col-form-label">{{form.price.label()}}</label>
+                <div class="col-sm-10">{{form.price(class_= "form-control")}}</div>
+            </div>
+            <div class="mb-3 row me-auto">
+                <label class="col-sm-5 col-form-label">{{form.brand.label()}} </label>
+                <div class="col-sm-10">{{form.brand(class_= "form-control")}}</div>
+            </div>
+            <div class="mb-3 row me-auto">
+                <label class="col-sm-5 col-form-label">{{form.category.label()}}</label>
+                <div class="col-sm-10">{{form.category(class_= "form-control")}}</div>
+            </div>
+            <div class="mb-3 row me-auto">
+                <label class="col-sm-5 col-form-label">{{form.images.label()}}</label>
+                <div class="col-sm-10">{{form.images(class_= "form-control")}}</div>
+            </div>
+            <div class="mb-3 row me-auto">{{form.submit(class_="btn btn-primary")}}</div>
+        </div>
+            
+    </div>
+</form>
+
+{% endblock %}

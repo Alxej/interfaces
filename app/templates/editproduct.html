@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+{{form.hidden_tag()}}
+<div class="col-2 mx-auto">
+    {% for msg in get_flashed_messages() %}
+    <div class="alert alert-danger" role="alert">{{msg}}</div>
+    {% endfor %}
+</div>
+<form action="" method="post", enctype="multipart/form-data">
+    {{ form.csrf_token }}
+<div class="row top-buffer justify-content-center">
+    <div class="col-4">
+        <div class="mb-3 row me-auto">
+            <label class="col-sm-5 col-form-label text-right">Прошлое название</label>
+            <a class="btn btn-light disabled placeholder col-12"><input type="text" readonly class="col-sm-10 form-control-plaintext" value="{{product_name}}"></a>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="mb-3 row me-auto">
+            <label class="col-sm-5 col-form-label text-right">{{form.name.label()}}</label>
+            <div class="col-sm-10">{{form.name(class_= "form-control", value_ = product_name)}}</div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center">
+    <div class="col-4">
+        <div class="mb-3 row me-auto">
+            <label class="col-sm-5 col-form-label text-right">Прошлое описание</label>
+            <a class="btn btn-light disabled placeholder col-12"><input type="text" readonly class="col-sm-10 form-control-plaintext" value="{{product_description}}"></a>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="mb-3 row me-auto">
+            <label class="col-sm-5 col-form-label text-right">{{form.product_description.label()}}</label>
+            <div class="col-sm-10">{{form.product_description(class_= "form-control", value_ = product_description)}}</div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center">
+    <div class="col-4">
+        <div class="mb-3 row me-auto">
+            <label class="col-sm-5 col-form-label text-right">Прошлая цена товара</label>
+            <a class="btn btn-light disabled placeholder col-12"><input type="text" readonly class="col-sm-10 form-control-plaintext" value="{{price}}"></a>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="mb-3 row me-auto">
+            <label class="col-sm-5 col-form-label text-right">{{form.price.label()}}</label>
+            <div class="col-sm-10">{{form.price(class_= "form-control", value_ = price)}}</div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center">
+    <div class="col-4">
+        <div class="mb-3 row me-auto">
+            <label class="col-sm-5 col-form-label text-right">Прошлый бренд</label>
+            <a class="btn btn-light disabled placeholder col-12"><input type="text" readonly class="col-sm-10 form-control-plaintext" value="{{brand}}"></a>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="mb-3 row me-auto">
+            <label class="col-sm-5 col-form-label text-right">{{form.brand.label()}}</label>
+            <div class="col-sm-10">{{form.brand(class_= "form-control")}}</div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center">
+    <div class="col-4">
+        <div class="mb-3 row me-auto">
+            <label class="col-sm-5 col-form-label text-right">Прошлая категория</label>
+            <a class="btn btn-light disabled placeholder col-12"><input type="text" readonly class="col-sm-10 form-control-plaintext" value="{{category}}"></a>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="mb-3 row me-auto">
+            <label class="col-sm-5 col-form-label text-right">{{form.category.label()}}</label>
+            <div class="col-sm-10">{{form.category(class_= "form-control")}}</div>
+        </div>
+    </div>
+</div>
+{% if form.deleted_images.choices|length > 0 %}
+<div class="row justify-content-center top-buffer text-center">
+    <div class="col-12">
+        <label class="col-sm-5 col-form-label text-right">{{form.deleted_images.label()}}</label>
+    </div>
+</div>
+{{form.deleted_images()}}
+{% endif %}
+<div class="row justify-content-center">
+    <div class="col-4">
+        <div class="mb-3 row me-auto">
+            <label class="col-sm-5 col-form-label text-right">Загруженные изображения</label>
+            <a class="btn btn-light disabled placeholder col-12"><input type="text" readonly class="col-sm-10 form-control-plaintext" value="{{images_label}}"></a>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="mb-3 row me-auto">
+            <label class="col-sm-5 col-form-label text-right">{{form.images.label()}}</label>
+            <div class="col-sm-10">{{form.images(class_= "form-control")}}</div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center top-buffer">
+    <div class="col-4">
+        <div class="mb-3 row me-auto">{{form.submit(class_="btn btn-primary")}}</div>
+    </div>
+</div>
+</form>
+{% endblock %}
