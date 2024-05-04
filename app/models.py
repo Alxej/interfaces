@@ -1,4 +1,4 @@
-from app import db
+from .extensions import db
 
 
 class Product(db.Model):
@@ -7,8 +7,8 @@ class Product(db.Model):
     name = db.Column(db.String(128), nullable=False)
     product_description = db.Column(db.String(256))
     price = db.Column(db.Double)
-    brand_id = db.Column(db.Integer, db.ForeignKey('brands.id'), nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
+    brand_id = db.Column(db.Integer, db.ForeignKey('brands.id'))
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
     
     images = db.relationship("Image", backref='thing', lazy=True)
     brand = db.relationship("Brand", backref='br', lazy=True)
