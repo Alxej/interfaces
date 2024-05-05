@@ -24,6 +24,7 @@ def admin_required(func):
     def wrapper(*args, **kwargs):
         if current_user.name != "admin":
             return {"error": "you don`t have permission for that"}, 403
+        return func(*args, **kwargs)
     return wrapper
 
 
@@ -31,4 +32,5 @@ def manager_required(func):
     def wrapper(*args, **kwargs):
         if current_user.name == "guest":
             return {"error": "you don`t have permission for that"}, 403
+        return func(*args, **kwargs)
     return wrapper
