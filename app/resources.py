@@ -5,11 +5,14 @@ from werkzeug.utils import secure_filename
 import werkzeug
 import os
 
-from .extensions import db, allowed_file
+from .extensions import db, allowed_file, images
 from .api_models import category_model, category_input_model, brand_model, brand_input_model, image_model, product_model, product_input_model  # noqa: E501
 from .models import Category, Brand, Product, Image
 
-ns = Namespace("api")
+ns = Namespace("ProductApi")
+ca = Namespace("CategoriesApi")
+im = Namespace("ImagesApi")
+br = Namespace("BrandsApi")
 
 pagination_parser = reqparse.RequestParser()
 pagination_parser.add_argument(
@@ -109,10 +112,13 @@ class ProductAPI(Resource):
         product = Product.query.get(id)
         if not product:
             raise ValueError("no product with that id")
-        images = product.images
-        for image in images:
-            os.remove(os.getcwd().replace('\\', '/') + "/app" +
-                      url_for('static', filename=f'uploads/{image.image_name}')) # noqa E501
+        product_images = product.images
+        for image in product_images:
+            try:
+                os.remove(os.getcwd().replace('\\', '/') + "/app" +
+                          url_for('static', filename=f'uploads/{image.image_name}')) # noqa E501
+            except Exception:
+                print("file is already deleted")
             db.session.delete(image)
             db.session.flush()
         db.session.delete(product)
@@ -120,14 +126,14 @@ class ProductAPI(Resource):
         return {"message": "product deleted"}, 204
 
 
-@ns.route("/images")
+@im.route("/images")
 class ImageListAPI(Resource):
-    @ns.marshal_list_with(image_model)
+    @im.marshal_list_with(image_model)
     def get(self):
         return Image.query.all()
 
-    @ns.expect(image_parser)
-    @ns.marshal_with(image_model)
+    @im.expect(image_parser)
+    @im.marshal_with(image_model)
     def post(self):
         args = image_parser.parse_args()
         product = Product.query.get(args['product_id'])
@@ -136,9 +142,7 @@ class ImageListAPI(Resource):
 
         image = args['file']
         if image and allowed_file(image.filename):
-            filename = secure_filename(image.filename)
-            image.save(os.path.join('app/static/uploads/',
-                                    filename))
+            filename = images.save(image)
             image_to_add = Image(product_id=product.id,
                                  image_name=filename)
             db.session.add(image_to_add)
@@ -148,17 +152,17 @@ class ImageListAPI(Resource):
             raise ValueError("image is not allowed")
 
 
-@ns.route("/images/<int:id>")
+@im.route("/images/<int:id>")
 class ImageAPI(Resource):
-    @ns.marshal_with(image_model)
+    @im.marshal_with(image_model)
     def get(self, id):
         image = Image.query.get(id)
         if not image:
             raise ValueError("there is no image with that id")
         return Image.query.get(id), 201
 
-    @ns.expect(image_parser)
-    @ns.marshal_with(image_model)
+    @im.expect(image_parser)
+    @im.marshal_with(image_model)
     def put(self, id):
         image = Image.query.get(id)
         if not image:
@@ -194,20 +198,20 @@ class ImageAPI(Resource):
         return {"message": f"image {id} deleted"}, 204
 
 
-@ns.route("/brands")
+@br.route("/brands")
 class BrandListAPI(Resource):
-    @ns.errorhandler(Exception)
+    @br.errorhandler(Exception)
     def handle_value_error_exception(exception):
         return {"error": str(exception)}, 400
 
-    @ns.marshal_list_with(brand_model)
+    @br.marshal_list_with(brand_model)
     def get(self):
         return Brand.query.all()
 
-    @ns.expect(brand_input_model)
-    @ns.marshal_list_with(brand_model)
+    @br.expect(brand_input_model)
+    @br.marshal_list_with(brand_model)
     def post(self):
-        brand = Brand(brand_name=ns.payload["brand_name"])
+        brand = Brand(brand_name=br.payload["brand_name"])
         try:
             db.session.add(brand)
             db.session.flush()
@@ -217,26 +221,26 @@ class BrandListAPI(Resource):
             return {}, 408
 
 
-@ns.route("/brands/<int:id>")
+@br.route("/brands/<int:id>")
 class BrandApi(Resource):
-    @ns.errorhandler(Exception)
+    @br.errorhandler(Exception)
     def handle_value_error_exception(exception):
         return {"error": str(exception)}, 400
 
-    @ns.marshal_with(brand_model)
+    @br.marshal_with(brand_model)
     def get(self, id):
         brand = Brand.query.get(id)
         if not brand:
             raise ValueError("brand with that id is not exist")
         return brand, 201
 
-    @ns.expect(brand_input_model)
-    @ns.marshal_with(brand_model)
+    @br.expect(brand_input_model)
+    @br.marshal_with(brand_model)
     def put(self, id):
         brand = Brand.query.get(id)
         if not brand:
             raise ValueError("brand with that id is not exist")
-        brand.brand_name = ns.payload["brand_name"]
+        brand.brand_name = br.payload["brand_name"]
         db.session.commit()
         return brand, 201
 
@@ -249,20 +253,20 @@ class BrandApi(Resource):
         return {}, 204
 
 
-@ns.route("/categories")
+@ca.route("/categories")
 class CategoryListAPI(Resource):
-    @ns.errorhandler(Exception)
+    @ca.errorhandler(Exception)
     def handle_value_error_exception(exception):
         return {"error": str(exception)}, 400
 
-    @ns.marshal_list_with(category_model)
+    @ca.marshal_list_with(category_model)
     def get(self):
         return Category.query.all()
 
-    @ns.expect(category_input_model)
-    @ns.marshal_list_with(category_model)
+    @ca.expect(category_input_model)
+    @ca.marshal_list_with(category_model)
     def post(self):
-        category = Category(category_name=ns.payload["category_name"])
+        category = Category(category_name=ca.payload["category_name"])
         try:
             db.session.add(category)
             db.session.flush()
@@ -272,26 +276,26 @@ class CategoryListAPI(Resource):
             return {}, 408
 
 
-@ns.route("/categories/<int:id>")
+@ca.route("/categories/<int:id>")
 class CategoryApi(Resource):
-    @ns.errorhandler(Exception)
+    @ca.errorhandler(Exception)
     def handle_value_error_exception(exception):
         return {"error": str(exception)}, 400
 
-    @ns.marshal_with(category_model)
+    @ca.marshal_with(category_model)
     def get(self, id):
         category = Category.query.get(id)
         if not category:
             raise ValueError("category with that id is not exist")
         return category, 201
 
-    @ns.expect(category_input_model)
-    @ns.marshal_with(category_model)
+    @ca.expect(category_input_model)
+    @ca.marshal_with(category_model)
     def put(self, id):
         category = Category.query.get(id)
         if not category:
             raise ValueError("category with that id is not exist")
-        category.category_name = ns.payload["category_name"]
+        category.category_name = ca.payload["category_name"]
         db.session.commit()
         return category, 201
 

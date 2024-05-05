@@ -1,9 +1,9 @@
-from flask import Flask, render_template, flash, redirect, url_for, request
-from flask_uploads import configure_uploads, IMAGES, UploadSet
-from app.forms import ProductCreationForm, CategoryCreationForm, BrandCreationForm
+from flask import Flask  # render_template, flash, redirect, url_for, request
+from flask_uploads import configure_uploads
+# from app.forms import ProductCreationForm, CategoryCreationForm, BrandCreationForm # noqaE501
 
-from .extensions import api, db, migrate
-from .resources import ns
+from .extensions import api, db, migrate, images
+from .resources import ns, br, ca, im
 
 
 def create_app():
@@ -13,7 +13,6 @@ def create_app():
     app.config["UPLOADED_FILES_ALLOW"] = ["jpeg", "gif", "jpg", "png"]
     app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///site.db'
     app.config['UPLOADED_IMAGES_DEST'] = 'app/static/uploads/'
-    images = UploadSet('images', IMAGES)
     configure_uploads(app, images)
 
     api.init_app(app)
@@ -26,5 +25,8 @@ def create_app():
             migrate.init_app(app, db)
 
     api.add_namespace(ns)
+    api.add_namespace(ca)
+    api.add_namespace(br)
+    api.add_namespace(im)
 
     return app
