@@ -1,18 +1,33 @@
 from flask_restx import Resource, Namespace, reqparse
 from flask import url_for
+from flask_jwt_extended import (jwt_required,
+                                current_user,
+                                create_access_token)
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
 
 import werkzeug
 import os
 
-from .extensions import db, allowed_file, images
-from .api_models import category_model, category_input_model, brand_model, brand_input_model, image_model, product_model, product_input_model  # noqa: E501
-from .models import Category, Brand, Product, Image
+from .extensions import (db,
+                         allowed_file,
+                         images,
+                         admin_required,
+                         manager_required)
+from .api_models import (
+    category_model, 
+    category_input_model, 
+    brand_model, 
+    brand_input_model, 
+    image_model, 
+    product_model, 
+    product_input_model,
+    role_model,
+    register_model,
+    user_model,
+    login_model)
+from .models import Category, Brand, Product, Image, User, Role
 
-ns = Namespace("ProductApi")
-ca = Namespace("CategoriesApi")
-im = Namespace("ImagesApi")
-br = Namespace("BrandsApi")
 
 pagination_parser = reqparse.RequestParser()
 pagination_parser.add_argument(
@@ -43,13 +58,31 @@ image_parser.add_argument('product_id',
                           required=True,
                           help='select product id')
 
+authorizations = {
+    "jsonWebToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+    }
+}
+
+ns = Namespace("ProductApi", authorizations=authorizations)
+ca = Namespace("CategoriesApi")
+im = Namespace("ImagesApi")
+br = Namespace("BrandsApi")
+us = Namespace("UserApi")
+
 
 @ns.route("/products")
 class ProductListAPI(Resource):
+    method_decorators = [jwt_required()]
+
     @ns.errorhandler(Exception)
     def handle_value_error_exception(exception):
         return {"error": str(exception)}, 400
 
+    @ns.doc(security="jsonWebToken")
+    @admin_required
     @ns.expect(pagination_parser)
     @ns.marshal_list_with(product_model)
     def get(self):
@@ -59,8 +92,10 @@ class ProductListAPI(Resource):
         products = Product.query.paginate(page=page, per_page=per_page)
         return products.items, 201
 
+    @ns.doc(security="jsonWebToken")
+    @manager_required
     @ns.expect(product_input_model)
-    @ns.marshal_list_with(product_model)
+    @ns.marshal_with(product_model)
     def post(self):
         product = Product(name=ns.payload["name"],
                           product_description=ns.payload["description"],
@@ -83,14 +118,20 @@ class ProductAPI(Resource):
     def handle_value_error_exception(exception):
         return {"error": str(exception)}, 400
 
+    @ns.doc(security="jsonWebToken")
+    @admin_required
     @ns.marshal_with(product_model)
     def get(self, id):
+        if current_user.name != "admin":
+            return {"error": "you don`t have permission for that action"}, 403
         product = Product.query.get(id)
         if not product:
             raise ValueError("no product with that id")
         return product
 
+    @ns.doc(security="jsonWebToken")
     @ns.expect(product_input_model)
+    @manager_required
     @ns.marshal_with(product_model)
     def put(self, id):
         product = Product.query.get(id)
@@ -108,6 +149,8 @@ class ProductAPI(Resource):
         db.session.commit()
         return product, 201
 
+    @ns.doc(security="jsonWebToken")
+    @manager_required
     def delete(self, id):
         product = Product.query.get(id)
         if not product:
@@ -128,10 +171,14 @@ class ProductAPI(Resource):
 
 @im.route("/images")
 class ImageListAPI(Resource):
+    @im.doc(security="jsonWebToken")
+    @admin_required
     @im.marshal_list_with(image_model)
     def get(self):
         return Image.query.all()
 
+    @im.doc(security="jsonWebToken")
+    @manager_required
     @im.expect(image_parser)
     @im.marshal_with(image_model)
     def post(self):
@@ -154,6 +201,8 @@ class ImageListAPI(Resource):
 
 @im.route("/images/<int:id>")
 class ImageAPI(Resource):
+    @im.doc(security="jsonWebToken")
+    @admin_required
     @im.marshal_with(image_model)
     def get(self, id):
         image = Image.query.get(id)
@@ -161,6 +210,8 @@ class ImageAPI(Resource):
             raise ValueError("there is no image with that id")
         return Image.query.get(id), 201
 
+    @im.doc(security="jsonWebToken")
+    @manager_required
     @im.expect(image_parser)
     @im.marshal_with(image_model)
     def put(self, id):
@@ -187,6 +238,8 @@ class ImageAPI(Resource):
         else:
             raise ValueError("image is not allowed")
 
+    @im.doc(security="jsonWebToken")
+    @manager_required
     def delete(self, id):
         image = Image.query.get(id)
         if not image:
@@ -204,10 +257,14 @@ class BrandListAPI(Resource):
     def handle_value_error_exception(exception):
         return {"error": str(exception)}, 400
 
+    @br.doc(security="jsonWebToken")
+    @admin_required
     @br.marshal_list_with(brand_model)
     def get(self):
         return Brand.query.all()
 
+    @br.doc(security="jsonWebToken")
+    @manager_required
     @br.expect(brand_input_model)
     @br.marshal_list_with(brand_model)
     def post(self):
@@ -227,6 +284,8 @@ class BrandApi(Resource):
     def handle_value_error_exception(exception):
         return {"error": str(exception)}, 400
 
+    @br.doc(security="jsonWebToken")
+    @admin_required
     @br.marshal_with(brand_model)
     def get(self, id):
         brand = Brand.query.get(id)
@@ -234,6 +293,8 @@ class BrandApi(Resource):
             raise ValueError("brand with that id is not exist")
         return brand, 201
 
+    @br.doc(security="jsonWebToken")
+    @manager_required
     @br.expect(brand_input_model)
     @br.marshal_with(brand_model)
     def put(self, id):
@@ -244,6 +305,8 @@ class BrandApi(Resource):
         db.session.commit()
         return brand, 201
 
+    @br.doc(security="jsonWebToken")
+    @manager_required
     def delete(self, id):
         brand = Brand.query.get(id)
         if not brand:
@@ -259,10 +322,14 @@ class CategoryListAPI(Resource):
     def handle_value_error_exception(exception):
         return {"error": str(exception)}, 400
 
+    @ca.doc(security="jsonWebToken")
+    @admin_required
     @ca.marshal_list_with(category_model)
     def get(self):
         return Category.query.all()
 
+    @ca.doc(security="jsonWebToken")
+    @manager_required
     @ca.expect(category_input_model)
     @ca.marshal_list_with(category_model)
     def post(self):
@@ -282,6 +349,8 @@ class CategoryApi(Resource):
     def handle_value_error_exception(exception):
         return {"error": str(exception)}, 400
 
+    @ca.doc(security="jsonWebToken")
+    @admin_required
     @ca.marshal_with(category_model)
     def get(self, id):
         category = Category.query.get(id)
@@ -289,6 +358,8 @@ class CategoryApi(Resource):
             raise ValueError("category with that id is not exist")
         return category, 201
 
+    @ca.doc(security="jsonWebToken")
+    @manager_required
     @ca.expect(category_input_model)
     @ca.marshal_with(category_model)
     def put(self, id):
@@ -299,6 +370,8 @@ class CategoryApi(Resource):
         db.session.commit()
         return category, 201
 
+    @ca.doc(security="jsonWebToken")
+    @manager_required
     def delete(self, id):
         category = Category.query.get(id)
         if not category:
@@ -306,3 +379,55 @@ class CategoryApi(Resource):
         db.session.delete(category)
         db.session.commit()
         return {}, 204
+
+
+@us.route("/users")
+class UserList(Resource):
+    @us.doc(security="jsonWebToken")
+    @admin_required
+    @us.marshal_list_with(user_model)
+    def get(self):
+        users = User.query.all()
+        return users, 201
+
+
+@us.route("/roles")
+class RoleListApi(Resource):
+    @us.doc(security="jsonWebToken")
+    @admin_required
+    @us.marshal_list_with(role_model)
+    def get(self):
+        roles = Role.query.all()
+        return roles, 201
+
+
+@us.route("/register")
+class RegisterApi(Resource):
+    @us.expect(register_model)
+    @us.marshal_with(user_model)
+    def post(self):
+        role = Role.query.filter(Role.name == us.payload["role"]).first()
+        if not role:
+            raise ValueError("there is no such a role")
+        user = User(username=us.payload["username"],
+                    password_hash=generate_password_hash(us.payload["password"]), # noqa E501
+                    role_id=role.id)
+        db.session.add(user)
+        db.session.commit()
+        return user, 201
+
+
+@us.route("/login")
+class LoginApi(Resource):
+    @us.expect(login_model)
+    def post(self):
+        user = User.query.filter(User.username ==
+                                 us.payload["username"]).first()
+        if not user:
+            return {"error": "User does not exist"}, 401
+        if not check_password_hash(user.password_hash,
+                                   us.payload["password"]):
+            return {"error": "Incorrect password"}, 401
+
+        return {"access_token": create_access_token(user),
+                "role": user.role.name}

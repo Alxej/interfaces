@@ -46,3 +46,24 @@ class Brand(db.Model):
 
     def __repr__(self):
         return f'<Brand {self.brand_name}>'
+
+
+class User(db.Model):
+    __tablename__ = "users"
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(128), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128))
+    role_id = db.Column(db.ForeignKey('roles.id'))
+
+    role = db.relationship("Role", back_populates="users")
+
+    def __repr__(self):
+        return f'<User {self.username}>'
+
+
+class Role(db.Model):
+    __tablename__ = "roles"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), unique=True, nullable=False)
+
+    users = db.relationship("User", back_populates="role")

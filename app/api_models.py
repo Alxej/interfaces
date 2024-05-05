@@ -47,3 +47,25 @@ product_input_model = api.model("ProductAdding", {
     "category_id": fields.Integer,
     "brand_id": fields.Integer
 })
+
+role_model = api.model("Role", {
+    "id": fields.Integer,
+    "name": fields.String
+})
+
+login_model = api.model("LoginModel", {
+    "username": fields.String,
+    "password": fields.String
+})
+
+user_model = api.model("UserModel", {
+    "id": fields.Integer,
+    "username": fields.String,
+    "role": fields.Nested(role_model)
+})
+
+register_model = api.model("RegisterModel", {
+    "username": fields.String,
+    "password": fields.String,
+    "role": fields.String
+})
