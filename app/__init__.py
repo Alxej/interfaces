@@ -4,7 +4,7 @@ from flask_uploads import configure_uploads
 
 from .extensions import api, db, migrate, jwt, images
 from .models import User
-from .resources import ns, br, ca, im, us
+from .resources import ns, br, ca, im, us, o
 
 
 def create_app():
@@ -32,6 +32,7 @@ def create_app():
     api.add_namespace(br)
     api.add_namespace(im)
     api.add_namespace(us)
+    api.add_namespace(o)
 
     @jwt.user_identity_loader
     def user_identity_lookup(user):
@@ -40,6 +41,6 @@ def create_app():
     @jwt.user_lookup_loader
     def user_lookup_callback(_jwt_header, jwt_data):
         identity = jwt_data["sub"]
-        return User.query.filter(User.id == identity).first().role
+        return User.query.filter(User.id == identity).first()
 
     return app

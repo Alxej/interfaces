@@ -1,10 +1,12 @@
 from flask_restx import Resource, Namespace, reqparse
 from flask import url_for
 from flask_jwt_extended import (jwt_required,
+                                current_user,
                                 create_access_token)
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from datetime import timedelta
 import werkzeug
 import os
 
@@ -24,8 +26,10 @@ from .api_models import (
     role_model,
     register_model,
     user_model,
-    login_model)
-from .models import Category, Brand, Product, Image, User, Role
+    login_model,
+    order_model,
+    order_input_model)
+from .models import Category, Brand, Product, Image, User, Role, Order
 
 
 pagination_parser = reqparse.RequestParser()
@@ -70,6 +74,7 @@ ca = Namespace("CategoriesApi")
 im = Namespace("ImagesApi")
 br = Namespace("BrandsApi")
 us = Namespace("UserApi")
+o = Namespace("OrderApi")
 
 
 @ns.route("/products")
@@ -85,7 +90,7 @@ class ProductListAPI(Resource):
                        403: "You don`t have permission for that"})
     @ns.expect(pagination_parser)
     @ns.marshal_list_with(product_model)
-    @admin_required
+    @manager_required
     def get(self):
         p_args = pagination_parser.parse_args()
         page = p_args.get("page")
@@ -118,6 +123,8 @@ class ProductListAPI(Resource):
 
 @ns.route("/products/<int:id>")
 class ProductAPI(Resource):
+    method_decorators = [jwt_required()]
+
     @ns.errorhandler(Exception)
     def handle_value_error_exception(exception):
         return {"error": str(exception)}, 400
@@ -127,7 +134,7 @@ class ProductAPI(Resource):
                        400: "product with that id is not exist",
                        403: "You don`t have permission for that"})
     @ns.marshal_with(product_model)
-    @admin_required
+    @manager_required
     def get(self, id):
         product = Product.query.get(id)
         if not product:
@@ -182,11 +189,13 @@ class ProductAPI(Resource):
 
 @im.route("/images")
 class ImageListAPI(Resource):
+    method_decorators = [jwt_required()]
+
     @im.doc(security="jsonWebToken",
             responses={201: "Success",
                        403: "You don`t have permission for that"})
     @im.marshal_list_with(image_model)
-    @admin_required
+    @manager_required
     def get(self):
         return Image.query.all(), 201
 
@@ -217,12 +226,14 @@ class ImageListAPI(Resource):
 
 @im.route("/images/<int:id>")
 class ImageAPI(Resource):
+    method_decorators = [jwt_required()]
+
     @im.doc(security="jsonWebToken",
             responses={201: "Success",
                        400: "image with that id is not exist",
                        403: "You don`t have permission for that"})
     @im.marshal_with(image_model)
-    @admin_required
+    @manager_required
     def get(self, id):
         image = Image.query.get(id)
         if not image:
@@ -278,6 +289,8 @@ class ImageAPI(Resource):
 
 @br.route("/brands")
 class BrandListAPI(Resource):
+    method_decorators = [jwt_required()]
+
     @br.errorhandler(Exception)
     def handle_value_error_exception(exception):
         return {"error": str(exception)}, 400
@@ -286,7 +299,7 @@ class BrandListAPI(Resource):
             responses={201: "Success",
                        403: "You don`t have permission for that"})
     @br.marshal_list_with(brand_model)
-    @admin_required
+    @manager_required
     def get(self):
         return Brand.query.all()
 
@@ -309,6 +322,8 @@ class BrandListAPI(Resource):
 
 @br.route("/brands/<int:id>")
 class BrandApi(Resource):
+    method_decorators = [jwt_required()]
+
     @br.errorhandler(Exception)
     def handle_value_error_exception(exception):
         return {"error": str(exception)}, 400
@@ -318,7 +333,7 @@ class BrandApi(Resource):
                        400: "brand with that id is not exist",
                        403: "You don`t have permission for that"})
     @br.marshal_with(brand_model)
-    @admin_required
+    @manager_required
     def get(self, id):
         brand = Brand.query.get(id)
         if not brand:
@@ -356,6 +371,8 @@ class BrandApi(Resource):
 
 @ca.route("/categories")
 class CategoryListAPI(Resource):
+    method_decorators = [jwt_required()]
+
     @ca.errorhandler(Exception)
     def handle_value_error_exception(exception):
         return {"error": str(exception)}, 400
@@ -364,7 +381,7 @@ class CategoryListAPI(Resource):
             responses={201: "Success",
                        403: "You don`t have permission for that"})
     @ca.marshal_list_with(category_model)
-    @admin_required
+    @manager_required
     def get(self):
         return Category.query.all(), 201
 
@@ -387,6 +404,8 @@ class CategoryListAPI(Resource):
 
 @ca.route("/categories/<int:id>")
 class CategoryApi(Resource):
+    method_decorators = [jwt_required()]
+
     @ca.errorhandler(Exception)
     def handle_value_error_exception(exception):
         return {"error": str(exception)}, 400
@@ -396,7 +415,7 @@ class CategoryApi(Resource):
                        400: "category with that id is not exist",
                        403: "You don`t have permission for that"})
     @ca.marshal_with(category_model)
-    @admin_required
+    @manager_required
     def get(self, id):
         category = Category.query.get(id)
         if not category:
@@ -434,6 +453,8 @@ class CategoryApi(Resource):
 
 @us.route("/users")
 class UserList(Resource):
+    method_decorators = [jwt_required()]
+
     @us.doc(security="jsonWebToken",
             responses={201: "Success",
                        403: "You don`t have permission for that"})
@@ -444,8 +465,27 @@ class UserList(Resource):
         return users, 201
 
 
+@us.route("/users/<int:id>/orders")
+class UserOrdersList(Resource):
+    method_decorators = [jwt_required()]
+
+    @ca.doc(security="jsonWebToken",
+            responses={201: "Success",
+                       403: "You don`t have permission for that"})
+    @ca.marshal_list_with(order_model)
+    @admin_required
+    def get(self, id):
+        user = User.query.get(id)
+        if not user:
+            raise ValueError("User with that id is not exist")
+        orders = Order.query.filter(Order.user_id == user.id).all()
+        return orders, 201
+
+
 @us.route("/roles")
 class RoleListApi(Resource):
+    method_decorators = [jwt_required()]
+
     @us.doc(security="jsonWebToken",
             responses={201: "Success",
                        403: "You don`t have permission for that"})
@@ -490,5 +530,36 @@ class LoginApi(Resource):
                                    us.payload["password"]):
             return {"error": "Incorrect password"}, 401
 
-        return {"access_token": create_access_token(user),
+        return {"access_token": create_access_token(user,
+                                                    expires_delta=timedelta(days=1)),   # noqa E501
                 "role": user.role.name}, 201
+
+
+@o.route("/order")
+class OrderListApi(Resource):
+    method_decorators = [jwt_required()]
+
+    @o.doc(security="jsonWebToken",
+           responses={201: "Success",
+                      403: "You don`t have permission for that"})
+    @o.marshal_list_with(order_model)
+    @manager_required
+    def get(self):
+        return Order.query.all(), 201
+
+    @o.doc(security="jsonWebToken",
+           responses={201: "Success",
+                      400: "Product with that id does not exist"})
+    @o.expect(order_input_model)
+    @o.marshal_with(order_model)
+    def post(self):
+        product = Product.query.filter(Product.id == o.payload["product_id"]).first() # noqa E501
+        if not product:
+            raise ValueError("Product with that id does not exist")
+        order = Order(product_id=product.id,
+                      user_id=current_user.id,
+                      count=o.payload["count"],
+                      total_price=product.price * o.payload["count"])
+        db.session.add(order)
+        db.session.commit()
+        return order, 201

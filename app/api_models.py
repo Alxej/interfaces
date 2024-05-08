@@ -69,3 +69,16 @@ register_model = api.model("RegisterModel", {
     "password": fields.String,
     "role": fields.String
 })
+
+order_model = api.model("OrderModel", {
+    "id": fields.Integer,
+    "count": fields.Integer,
+    "product": fields.Nested(product_model),
+    "user": fields.Nested(user_model),
+    "total_price": fields.Float
+})
+
+order_input_model = api.model("OrderInputModel", {
+    "product_id": fields.Integer,
+    "count": fields.Integer
+})

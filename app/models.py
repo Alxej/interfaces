@@ -55,7 +55,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(128))
     role_id = db.Column(db.ForeignKey('roles.id'))
 
-    role = db.relationship("Role", back_populates="users")
+    role = db.relationship("Role", lazy=True)
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -66,4 +66,16 @@ class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), unique=True, nullable=False)
 
-    users = db.relationship("User", back_populates="role")
+    # users = db.relationship("User", back_populates="role")
+
+
+class Order(db.Model):
+    __tablename__ = "orders"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey('users.id'))
+    product_id = db.Column(db.ForeignKey('products.id'))
+    count = db.Column(db.Integer)
+    total_price = db.Column(db.Double)
+
+    user = db.relationship("User", lazy=True)
+    product = db.relationship("Product", lazy=True)

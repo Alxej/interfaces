@@ -22,7 +22,7 @@ def allowed_file(filename):
 
 def admin_required(func):
     def wrapper(*args, **kwargs):
-        if current_user.name != "admin":
+        if current_user.role.name != "admin":
             return {"error": "you don`t have permission for that"}, 403
         return func(*args, **kwargs)
     return wrapper
@@ -30,7 +30,7 @@ def admin_required(func):
 
 def manager_required(func):
     def wrapper(*args, **kwargs):
-        if current_user.name == "guest":
+        if current_user.role.name == "guest":
             return {"error": "you don`t have permission for that"}, 403
         return func(*args, **kwargs)
     return wrapper
