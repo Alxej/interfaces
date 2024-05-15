@@ -1,4 +1,5 @@
 from .extensions import db
+from datetime import datetime
 
 
 class Product(db.Model):
@@ -76,6 +77,7 @@ class Order(db.Model):
     product_id = db.Column(db.ForeignKey('products.id'))
     count = db.Column(db.Integer)
     total_price = db.Column(db.Double)
+    date = db.Column(db.DateTime(), default=datetime.now())
 
     user = db.relationship("User", lazy=True)
     product = db.relationship("Product", lazy=True)

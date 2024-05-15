@@ -2,7 +2,7 @@ from flask import Flask  # render_template, flash, redirect, url_for, request
 from flask_uploads import configure_uploads
 # from app.forms import ProductCreationForm, CategoryCreationForm, BrandCreationForm # noqaE501
 
-from .extensions import api, db, migrate, jwt, images
+from .extensions import api, db, migrate, jwt, images, api_bp
 from .models import User
 from .resources import ns, br, ca, im, us, o
 
@@ -17,7 +17,7 @@ def create_app():
     app.config['UPLOADED_IMAGES_DEST'] = 'app/static/uploads/'
     configure_uploads(app, images)
 
-    api.init_app(app)
+    # api.init_app(app)
     db.init_app(app)
     jwt.init_app(app)
 
@@ -42,5 +42,7 @@ def create_app():
     def user_lookup_callback(_jwt_header, jwt_data):
         identity = jwt_data["sub"]
         return User.query.filter(User.id == identity).first()
+
+    app.register_blueprint(api_bp)
 
     return app

@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask import Blueprint
 from flask_restx import Api
 from flask_migrate import Migrate
 from flask_uploads import UploadSet, IMAGES
@@ -7,7 +8,10 @@ from flask_jwt_extended import JWTManager, current_user
 
 db = SQLAlchemy()
 migrate = Migrate()
-api = Api()
+
+api_bp = Blueprint("api", __name__, url_prefix="/api/")
+api = Api(api_bp)
+
 jwt = JWTManager()
 
 images = UploadSet('images', IMAGES)
