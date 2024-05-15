@@ -1,5 +1,6 @@
 from flask import Flask  # render_template, flash, redirect, url_for, request
 from flask_uploads import configure_uploads
+from flask_cors import CORS
 # from app.forms import ProductCreationForm, CategoryCreationForm, BrandCreationForm # noqaE501
 
 from .extensions import api, db, migrate, jwt, images, api_bp
@@ -9,6 +10,7 @@ from .resources import ns, br, ca, im, us, o
 
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
+    CORS(app)
     app.config["SECRET_KEY"] = 'jasd1khsjdk335ksfgsdvcbek54'
     app.config["JWT_SECRET_KEY"] = "234jii1ndbc132ubddscasd"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
