@@ -9,9 +9,6 @@
                                products=products,
                                page=page)
     
-    @app.route("/pr")
-    def pr():
-        return render_template("Competence.html")
     
     @app.route("/products/<int:product_id>/delete")
     def product_delete(product_id):

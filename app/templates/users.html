@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+<div class="row"><div class="col-12 text-center"><a href="/register"><button type="button" class="btn btn-primary">Добавить</button></a></div></div>
+
+<div class="row top-buffer" >
+    <div class="col-12 justify-content-center">
+        <ol class="list-group list-group-numbered td-list">
+            {% for user in users %}
+            <li class="list-group-item">Имя пользователя: <b>{{user.username}} </b>Роль: {{user.role.name}}
+                <div class="col-3">
+                    <a href="/users/{{user.id}}/edit"><button type="button" class="btn btn-info">Изменить</button></a>
+                    <a href="/users/{{user.id}}/delete"><button type="button" class="btn btn-danger">Удалить</button></a>
+                </div>
+            {% endfor %} 
+        </ol>
+    </div>
+    
+</div>
+{% endblock %}

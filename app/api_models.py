@@ -76,7 +76,8 @@ order_model = api.model("OrderModel", {
     "product": fields.Nested(product_model),
     "user": fields.Nested(user_model),
     "total_price": fields.Float,
-    "date": fields.DateTime
+    "date": fields.DateTime,
+    "status": fields.Boolean
 })
 
 order_input_model = api.model("OrderInputModel", {

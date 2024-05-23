@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from flask import Blueprint
+from flask import Blueprint, redirect, session
 from flask_restx import Api
 from flask_migrate import Migrate
 from flask_uploads import UploadSet, IMAGES
@@ -38,3 +38,22 @@ def manager_required(func):
             return {"error": "you don`t have permission for that"}, 403
         return func(*args, **kwargs)
     return wrapper
+
+
+def admin_required_front(func):
+    def wrapper(*args, **kwargs):
+        if 'user_role' not in session.keys():
+            return {"error": "you don`t have permission for that"}, 403
+        else:
+            if session['user_role'] != "admin":
+                return {"error": "you don`t have permission for that"}, 403
+        return func(*args, **kwargs)
+    return wrapper
+
+
+def manager_required_front():
+    if 'user_role' not in session.keys():
+        return {"error": "you don`t have permission for that"}, 403
+    else:
+        if session['user_role'] == "guest":
+            return {"error": "you don`t have permission for that"}, 403

@@ -5,6 +5,7 @@ from flask_jwt_extended import (jwt_required,
                                 create_access_token)
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_cors import cross_origin
 
 from datetime import timedelta
 import werkzeug
@@ -521,6 +522,7 @@ class LoginApi(Resource):
         401: "User does not exist || Incorrect password",
         201: "Success"})
     @us.expect(login_model)
+    @cross_origin()
     def post(self):
         user = User.query.filter(User.username ==
                                  us.payload["username"]).first()
@@ -563,3 +565,28 @@ class OrderListApi(Resource):
         db.session.add(order)
         db.session.commit()
         return order, 201
+
+
+@o.route("/order/<int:id>")
+class OrderIdApi(Resource):
+    method_decorators = [jwt_required()]
+
+    @o.doc(security="jsonWebToken",
+           responses={201: "Success",
+                      403: "You don`t have permission for that"})
+    @o.marshal_with(order_model)
+    @manager_required
+    def get(self, id):
+        return Order.query.get(id), 201
+
+    @o.doc(security="jsonWebToken",
+           responses={204: "Success",
+                      403: "You don`t have permission for that"})
+    @manager_required
+    def delete(self, id):
+        order = Order.query.get(id)
+        if not order:
+            raise ValueError("order with that id is not exist")
+        db.session.delete(order)
+        db.session.commit()
+        return {}, 204

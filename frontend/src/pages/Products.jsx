@@ -5,9 +5,11 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import getProducts from '../api/productApi';
 
 
 export default function Products() {
+    
   return (
     <div style={{display: "flex", flexWrap: "wrap"}}>
         <Card sx={{ maxWidth: 345 }}>

@@ -8,10 +8,11 @@
 </head>
 <body >
     <div class="container-fluid gradient min-vh-100">
+        {% if role == "manager" %}
         <nav class="navbar justify-content-center">
             <ul class="nav nav-underline">
                 <li class="nav-item" >
-                    <a class="nav-link" id="items"  href="/"><h5>Список товаров</h5></a>
+                    <a class="nav-link" id="items"  href="/products"><h5>Список товаров</h5></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" id="categories"  href="/categories"><h5>Категории</h5></a>
@@ -19,8 +20,63 @@
                 <li class="nav-item">
                     <a class="nav-link" id="brands"  href="/brands"><h5>Бренды</h5></a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="brands"  href="/history"><h5>Мои покупки</h5></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="brands"  href="/basket"><h5>Корзина</h5></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="brands"  href="/logout"><h5>Выйти({{username}})</h5></a>
+                </li>
             </ul>
         </nav>
+        {% endif %}
+        {% if role == "admin" %}
+        <nav class="navbar justify-content-center">
+            <ul class="nav nav-underline">
+                <li class="nav-item" >
+                    <a class="nav-link" id="items"  href="/products"><h5>Список товаров</h5></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="categories"  href="/categories"><h5>Категории</h5></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="brands"  href="/brands"><h5>Бренды</h5></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="brands"  href="/users"><h5>Пользователи</h5></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="brands"  href="/history"><h5>Мои покупки</h5></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="brands"  href="/basket"><h5>Корзина</h5></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="brands"  href="/logout"><h5>Выйти({{username}})</h5></a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+        {% if role == "guest" %}
+        <nav class="navbar justify-content-center">
+            <ul class="nav nav-underline">
+                <li class="nav-item" >
+                    <a class="nav-link" id="items"  href="/products"><h5>Список товаров</h5></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="brands"  href="/history"><h5>Мои покупки</h5></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="brands"  href="/basket"><h5>Корзина</h5></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="brands"  href="/logout"><h5>Выйти({{username}})</h5></a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
         {% block content %}
         {% endblock %}
     </div>

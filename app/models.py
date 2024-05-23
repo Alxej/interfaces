@@ -75,9 +75,9 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey('users.id'))
     product_id = db.Column(db.ForeignKey('products.id'))
-    count = db.Column(db.Integer)
     total_price = db.Column(db.Double)
     date = db.Column(db.DateTime(), default=datetime.now())
+    status = db.Column(db.Boolean(), default=False)
 
     user = db.relationship("User", lazy=True)
     product = db.relationship("Product", lazy=True)

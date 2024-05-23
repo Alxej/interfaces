@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+{{form.hidden_tag()}}
+<div class="col-2 mx-auto">
+    {% for msg in get_flashed_messages() %}
+    <div class="alert alert-danger" role="alert">{{msg}}</div>
+    {% endfor %}
+</div>
+<form action="" method="post", enctype="multipart/form-data">
+    {{ form.csrf_token }}
+<div class="row top-buffer justify-content-center">
+    <div class="col-4">
+        <div class="mb-3 row me-auto">
+            <label class="col-sm-5 col-form-label text-right">Прошлое имя</label>
+            <a class="btn btn-light disabled placeholder col-12"><input type="text" readonly class="col-sm-10 form-control-plaintext" value="{{cur_username}}"></a>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="mb-3 row me-auto">
+            <label class="col-sm-5 col-form-label text-right">{{form.username.label()}}</label>
+            <div class="col-sm-10">{{form.username(class_= "form-control", value_ = cur_username)}}</div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center">
+    <div class="col-4">
+        <div class="mb-3 row me-auto">
+            <label class="col-sm-5 col-form-label text-right">Прошлая роль</label>
+            <a class="btn btn-light disabled placeholder col-12"><input type="text" readonly class="col-sm-10 form-control-plaintext" value="{{cur_role}}"></a>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="mb-3 row me-auto">
+            <label class="col-sm-5 col-form-label text-right">{{form.role.label()}}</label>
+            <div class="col-sm-10">{{form.role(class_= "form-control")}}</div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center top-buffer">
+    <div class="col-4">
+        <div class="mb-3 row me-auto">{{form.submit(class_="btn btn-primary")}}</div>
+    </div>
+</div>
+</form>
+{% endblock %}

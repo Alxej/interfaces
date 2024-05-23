@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import { Link } from 'react-router-dom';
 
 
 export default function Navbar() {
@@ -15,10 +16,10 @@ export default function Navbar() {
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         Store
                     </Typography>
-                    <Button color="inherit">Products</Button>
-                    <Button color="inherit">Categories</Button>
-                    <Button color="inherit">Brands</Button>
-                    <Button color="inherit">Login</Button>
+                    <Button component={Link} to="/admin/product" color="inherit">Products</Button>
+                    <Button component={Link} to="/admin/categories" color="inherit">Categories</Button>
+                    <Button component={Link} to="/admin/brands" color="inherit">Brands</Button>
+                    <Button component={Link} to="/admin/login" color="inherit">Login</Button>
                 </Toolbar>
             </AppBar>
         </Box>

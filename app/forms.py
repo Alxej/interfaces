@@ -1,4 +1,4 @@
-from wtforms import StringField, SubmitField, DecimalField, MultipleFileField, TextAreaField, SelectField, validators, widgets, SelectMultipleField
+from wtforms import StringField, SubmitField, DecimalField, MultipleFileField, TextAreaField, SelectField, validators, widgets, SelectMultipleField, PasswordField
 from wtforms.validators import DataRequired, Length, ValidationError
 from flask_wtf import FlaskForm
 from flask import url_for
@@ -47,6 +47,24 @@ class ProductEditingForm(ProductCreationForm):
 class BrandCreationForm(FlaskForm):
     brand_name = StringField("Название бренда: ", validators=[DataRequired(), Length(max=128)])
     submit = SubmitField("Сохранить бренд")
+
+
+class LoginForm(FlaskForm):
+    username = StringField("Имя пользователя: ", validators=[DataRequired(), Length(max=128)])
+    password = PasswordField("Пароль: ", validators=[DataRequired(), Length(max=128)])
+    submit = SubmitField("Войти")
+
+
+class RegistrationForm(FlaskForm):
+    username = StringField("Имя пользователя: ", validators=[DataRequired(), Length(max=128)])
+    password = PasswordField("Пароль: ", validators=[DataRequired(), Length(max=128)])
+    role = SelectField("Роль: ")
+    submit = SubmitField("Зарегистрировать")
+
+class EditUserForm(FlaskForm):
+    username = StringField("Имя пользователя: ", validators=[DataRequired(), Length(max=128)])
+    role = SelectField("Роль: ")
+    submit = SubmitField("Сохранить")
 
 
 class CategoryCreationForm(FlaskForm):
